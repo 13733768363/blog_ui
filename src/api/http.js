@@ -17,7 +17,7 @@ const JSONHEADER = {
 };
 
 
-const baseUrl = 'http://localhost:8080';
+const baseUrl = 'http://114.115.140.191:8080';
 
 export default {
     get(url, param) {

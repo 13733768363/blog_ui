@@ -12,8 +12,8 @@ const actions = {
       return res.data;
     })
   },
-  getBlogsByUserApi({ commit }, { payload }) {
-    return http.post(`${http.baseUrl}/blog/getBlogsByUser`, payload, http.JSONHEADER).then(res => {
+  getBlogsByUserApi({ commit }, payload) {
+    return http.post(`${http.baseUrl}/blog/getBlogsByUser?tagId=${payload.tagId}`, http.FORMHEADER).then(res => {
       return res.data;
     })
   },

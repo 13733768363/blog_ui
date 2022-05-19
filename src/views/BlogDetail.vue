@@ -1,11 +1,13 @@
 <template>
-  <div style="padding: 10px">
+  <div class="body-item">
+    <div style="padding: 10px">
     <div style="font-size: 20px">{{title}}</div>
     <el-divider></el-divider>
     <div style="font-size: 10px">博主：{{createUser}}</div>
     <div style="font-size: 10px">创建时间：{{createTime}}&emsp;&emsp;更新时间：{{updateTime}}</div>
     <el-divider></el-divider>
     <div id="detail"></div>
+  </div>
   </div>
 </template>
 
@@ -59,4 +61,10 @@ export default {
 };
 </script>
 <style>
+.body-item {
+  background-color: #f5f7fa;
+  width: 99vw;
+  height: 98vh;
+  padding-left: 10px;
+}
 </style>

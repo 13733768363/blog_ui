@@ -6,7 +6,7 @@ import EditBlog from '../views/EditBlog.vue'
 import Index from '../views/Index.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import BlogManage from '../views/BlogManage.vue'
-
+import TagManage from '../views/TagManage.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -39,6 +39,11 @@ const routes = [
     path: '/blogManage',
     name: 'BlogManage',
     component: BlogManage
+  },
+  {
+    path: '/tagManage',
+    name: 'TagManage',
+    component: TagManage
   }
   // {
   //   path: '/about',
@@ -57,7 +62,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   //定义需要拦截的路由
-  const handleRouters = ['/', 'blogManage'];
+  const handleRouters = ['/', 'blogManage', 'tagManage'];
   if (handleRouters.indexOf(to.path) !== -1) {
     if (localStorage.getItem('token')) {
       next();

@@ -1,33 +1,22 @@
 <template>
   <div style="padding: 10px">
-    <div style="font-size: 20px">博客管理</div>
+    <div style="font-size: 20px">标签管理</div>
     <el-divider></el-divider>
-    <div class="blog-table">
+    <el-button type="primary" size="small" plain @click="addTag()"
+      >新增标签</el-button
+    >
+    <div class="tag-table">
       <el-table
         :data="tableData"
         style="width: 100%"
+        size="small"
         stripe
         border
         header-cell-class-name="table-header"
       >
-        <el-table-column label="序号" align="center">
+        <el-table-column label="标签名称" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
-            <span>{{ scope.row.index + 1 }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="标题" align="center" show-overflow-tooltip>
-          <template slot-scope="scope">
-            <span>{{ scope.row.title }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="概要" align="center" show-overflow-tooltip>
-          <template slot-scope="scope">
-            <span>{{ scope.row.simpleDes }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="标签" align="center" show-overflow-tooltip>
-          <template slot-scope="scope">
-            <span>{{ scope.row.tagName }}</span>
+            <span>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" show-overflow-tooltip>
@@ -37,7 +26,7 @@
         </el-table-column>
         <el-table-column label="更新时间" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
-            <span>{{ scope.row.createTime }}</span>
+            <span>{{ scope.row.updateTime }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
@@ -46,14 +35,14 @@
               type="success"
               size="mini"
               plain
-              @click="editBlog(scope.row)"
+              @click="editTag(scope.row)"
               >编辑</el-button
             >
             <el-button
               size="mini"
               type="danger"
               plain
-              @click="deleteBlog(scope.row)"
+              @click="deleteTag(scope.row)"
               >删除</el-button
             >
           </template>
@@ -91,21 +80,24 @@ export default {
     //
   },
   methods: {
-    ...mapActions("blog", ["getBlogsWithUserAndPageApi", "deleteBlogByIdApi"]),
+    ...mapActions("tag", [
+      "addTagApi",
+      "deleteTagByIdApi",
+      "updateTagByIdApi",
+      "getTagListByUserApi",
+    ]),
 
     getTableData() {
-      this.getBlogsWithUserAndPageApi({
+      this.getTagListByUserApi({
         payload: {
           current: this.current,
           size: this.size,
+          keyword: "",
         },
       })
         .then((res) => {
           if (res.success) {
             this.tableData = res.data.records || [];
-            this.tableData.forEach((item, index) => {
-              item.index = index;
-            });
             this.total = res.data.total || 0;
           } else {
             if (res.msg.indexOf("reLogin") != -1) {
@@ -128,21 +120,65 @@ export default {
       this.current = val;
       this.getTableData();
     },
-    editBlog(row) {
-      this.$router.push({
-        path: "/editBlog",
-        query: { editItem: row, isEdit: true },
-      });
+    addTag() {
+      this.$prompt("请输入标签名称", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/,
+        inputErrorMessage: "标签名称不能为空",
+      })
+        .then(({ value }) => {
+          this.addTagApi({
+            name: value,
+          }).then((res) => {
+            if (res.success) {
+              this.$message.success(res.data);
+              this.getTableData();
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+        })
+        .catch(() => {
+          //
+        });
     },
-    deleteBlog(row) {
-      this.$confirm("此操作将永久删除该博客, 是否继续?", "提示", {
+    editTag(row) {
+      this.$prompt("请输入新的标签名称", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^[\s\S]*.*[^\s][\s\S]*$/,
+        inputErrorMessage: "标签名称不能为空",
+      })
+        .then(({ value }) => {
+          this.updateTagByIdApi({
+            id: row.id,
+            name: value,
+            createTime: row.createTime,
+            updateTime: row.updateTime,
+            createUser: row.createUser
+          }).then((res) => {
+            if (res.success) {
+              this.$message.success(res.data);
+              this.getTableData();
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+        })
+        .catch(() => {
+          //
+        });
+    },
+    deleteTag(row) {
+      this.$confirm("此操作将永久删除该标签, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
           //删除操作
-          this.deleteBlogById(row.id);
+          this.deleteTagById(row.id);
         })
         .catch(() => {
           this.$message({
@@ -151,11 +187,9 @@ export default {
           });
         });
     },
-    deleteBlogById(id) {
-      this.deleteBlogByIdApi({
-        payload: {
-          id: id,
-        },
+    deleteTagById(id) {
+      this.deleteTagByIdApi({
+        id: id,
       })
         .then((res) => {
           if (res.success) {
@@ -173,7 +207,8 @@ export default {
 };
 </script>
 <style>
-.blog-table {
+.tag-table {
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 .table-header {

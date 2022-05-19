@@ -12,6 +12,17 @@
           </el-input>
         </div>
         <div style="padding: 10px">
+          <el-select v-model="blog.tagId" clearable placeholder="请选择标签">
+            <el-option
+              v-for="(item, index) in tagList"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <div style="padding: 10px">
           <el-input
             style="width: 60%"
             type="textarea"
@@ -58,18 +69,22 @@ export default {
             title: "",
             simpleDes: "",
             content: "",
-            classifyId: "",
+            tagId: "",
             createUser: "",
             createTime: null,
             updateTime: null,
           },
       //是否是修改
       isEdit: this.$route.query.isEdit ? this.$route.query.isEdit : false,
+      tagList: []
     };
   },
   mounted() {
     this.initHeight();
     this.initEditor();
+  },
+  created() {
+    this.getAllTags();
   },
   methods: {
     ...mapActions("blog", [
@@ -77,6 +92,7 @@ export default {
       "insertBlogApi",
       "updateBlogByIdApi",
     ]),
+    ...mapActions("tag", ["getAllTagsByUserApi"]),
 
     //初始化元素高度
     initHeight() {
@@ -134,7 +150,17 @@ export default {
     //确认取消
     confirmCancel() {
       this.dialogVisible = false;
-      this.$router.push("/index");
+      this.$router.push("/blogManage");
+    },
+
+    getAllTags() {
+      this.getAllTagsByUserApi({
+        //
+      }).then(res => {
+        this.tagList = res.data || [];
+      }).catch(err => {
+        this.$message.error("获取标签列表发生异常");
+      })
     },
 
     //新增博客
